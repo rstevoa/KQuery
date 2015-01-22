@@ -13,7 +13,7 @@ import re
 from collections import deque
 
 
-class KQuery:
+class KQuery(object):
     """KQuery class
 
     This is the constructor for KQuery objects, which individually have their
