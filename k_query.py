@@ -7,7 +7,7 @@ to somewhat resemble JavaScript's jQuery.
 If you're just trying to get started with this, load your data structure (I
 would recommend building from a .kv file) and use the following line:
 
-KQuery.root = root # Or whatever the root node is for your interface
+KQuery.setup(root) # Or whatever the root node is for your interface
 """
 import kivy
 
