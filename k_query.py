@@ -22,6 +22,10 @@ class KQuery:
     def setup(cls, root):
         cls.root = root
 
+    @classmethod
+    def _search(cls, widget, parent):
+        pass
+
     def __init__(self, selector):
         # Must ensure that root is defined for this module
         try:
@@ -30,21 +34,16 @@ class KQuery:
             raise RootNotDefined("Root widget was not defined! Please refer \
                 to the documentation [help(k_query)].")
         self.selector = selector
-        self.widget = self._search(root)
 
     def __str__(self):
         return "KQuery object with selector " + self.selector
 
-    def append(self):
-        """Appends a KQuery object to a widget"""
+    def append(self, other):
+        """Appends a KQuery object to this widget"""
         pass
 
-    def append_to(self):
+    def append_to(self, other):
         """Appends this KQuery object to a widget"""
-        pass
-
-    def before(self):
-        """Appends content before the set of matched widgets"""
         pass
 
     def bind(self):
