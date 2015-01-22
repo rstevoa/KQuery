@@ -45,7 +45,7 @@ class KQuery(object):
         if type(arg1) is str:
             # If arg1 is a selector, we are searching for a widget
             self.selector = arg1
-            self.widgets = _search(arg1, self.root)
+            self.widgets = self._search(arg1, self.root)
         else:
             # If arg1 is a KQuery instance, we are constructing an object
             self.selector = arg2
@@ -61,7 +61,23 @@ class KQuery(object):
         queue = deque([widget])
         while not len(queue) is 0:
             node = queue.popleft()
-            ids = _get_ids(node.selector)
+            # get descriptor to match the presently-inspected widget
+            match = re.search("([^\s\>]+)([\>\s].*)?", selector)
+            descriptor = match.group(0)
+            if self._match_descriptors(descriptor, node.descriptor):
+                pass
+
+    def _match_descriptors(self, desc1, desc2):
+        """Check if ids and classes of the desc1 parameter are subsets of the
+        desc2 parameter
+        """
+        d1_ids = set(re.findall("#[a-zA-Z]+", desc1))
+        d1_classes = set(re.findall("\.[a-zA-Z]+", desc1))
+        d2_ids = set(re.findall("#[a-zA-Z]+", desc2))
+        d2_classes = set(re.findall("\.[a-zA-Z]+", desc2))
+        if d1_ids <= d2_ids and d1_classes <= d2_classes:
+            return True
+        return False
 
     def append(self, other):
         """Appends a KQuery object to this widget"""
