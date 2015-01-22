@@ -45,7 +45,7 @@ class KQuery(object):
         if type(arg1) is str:
             # If arg1 is a selector, we are searching for a widget
             self.selector = arg1
-            self.widgets = self._search(arg1, self.root)
+            self.widgets = self._search(arg1)
         else:
             # If arg1 is a KQuery instance, we are constructing an object
             self.selector = arg2
@@ -54,18 +54,24 @@ class KQuery(object):
     def __str__(self):
         return "KQuery object with selector " + self.selector
 
-    def _search(self, selector=None, widget=None):
+    def _search(self, selector):
         """Uses a BFS algorithm to look for elements matching a selector"""
         # Remember: need to handle ordering
 
-        queue = deque([widget])
+        queue = deque([(self.root, selector)])
         while not len(queue) is 0:
             node = queue.popleft()
             # get descriptor to match the presently-inspected widget
-            match = re.search("([^\s\>]+)([\>\s].*)?", selector)
-            descriptor = match.group(0)
+            match = re.search("([^\s\>]+)([\>\s].*)?", node[1])
+            descriptor = match.group(1)
             if self._match_descriptors(descriptor, node.descriptor):
-                pass
+                if match.group(2) is None:
+                    return node
+                for child in node[0].children:
+                    queue.append((child, match.group(2)))
+            for child in node[0].children:
+                queue.append((child, node[1]))
+        return None
 
     def _match_descriptors(self, desc1, desc2):
         """Check if ids and classes of the desc1 parameter are subsets of the
