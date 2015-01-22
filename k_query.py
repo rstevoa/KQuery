@@ -10,6 +10,7 @@ would recommend building from a .kv file) and use the following line:
 KQuery.setup(root) # Or whatever the root node is for your interface
 """
 import re
+from collections import deque
 
 
 class KQuery:
@@ -44,7 +45,7 @@ class KQuery:
         if type(arg1) is str:
             # If arg1 is a selector, we are searching for a widget
             self.selector = arg1
-            self.widgets = _search(selector=arg1)
+            self.widgets = _search(arg1, self.root)
         else:
             # If arg1 is a KQuery instance, we are constructing an object
             self.selector = arg2
@@ -53,17 +54,14 @@ class KQuery:
     def __str__(self):
         return "KQuery object with selector " + self.selector
 
-    def _search(self, selector=None, ids=None, classes=None):
+    def _search(self, selector=None, widget=None):
         """Uses a BFS algorithm to look for elements matching a selector"""
-        if selector is not None:
-            items = _split_selector(selector)
-            _search(ids=items[0], classes=items[1])
+        # Remember: need to handle ordering
 
-
-    def _split_selector(self, selector):
-        ids = re.findall("#[a-zA-Z]+", selector)
-        classes = re.findall("\.[a-zA-Z]+", selector)
-        return (ids, classes)
+        queue = deque([widget])
+        while not len(queue) is 0:
+            node = queue.popleft()
+            ids = _get_ids(node.selector)
 
     def append(self, other):
         """Appends a KQuery object to this widget"""
