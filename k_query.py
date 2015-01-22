@@ -9,7 +9,7 @@ would recommend building from a .kv file) and use the following line:
 
 KQuery.setup(root) # Or whatever the root node is for your interface
 """
-import kivy
+import re
 
 
 class KQuery:
@@ -19,24 +19,51 @@ class KQuery:
     own methods for appending, deleting, and traversing the document tree.
     """
     @classmethod
-    def setup(cls, root):
+    def setup(cls, root, debug):
+        """Sets up the KQuery class for use in an application"""
         cls.root = root
+        cls.debug = debug
 
-    @classmethod
-    def _search(cls, widget, parent):
-        pass
+    def __init__(self, arg1, arg2=""):
+        """This is a polymorphic function. The first argument is required,
+        and the second is optional.
 
-    def __init__(self, selector):
+        If the first argument is a selector (string), then a set of results
+        will be constructed using a search on the selector.
+
+        If the first argument is an object instance, the KQuery object will
+        be constructed by adding the selector.
+        """
         # Must ensure that root is defined for this module
         try:
-            root
+            self.root
         except:
             raise RootNotDefined("Root widget was not defined! Please refer \
                 to the documentation [help(k_query)].")
-        self.selector = selector
+
+        if type(arg1) is str:
+            # If arg1 is a selector, we are searching for a widget
+            self.selector = arg1
+            self.widgets = _search(selector=arg1)
+        else:
+            # If arg1 is a KQuery instance, we are constructing an object
+            self.selector = arg2
+            self.widgets = set(arg1)
 
     def __str__(self):
         return "KQuery object with selector " + self.selector
+
+    def _search(self, selector=None, ids=None, classes=None):
+        """Uses a BFS algorithm to look for elements matching a selector"""
+        if selector is not None:
+            items = _split_selector(selector)
+            _search(ids=items[0], classes=items[1])
+
+
+    def _split_selector(self, selector):
+        ids = re.findall("#[a-zA-Z]+", selector)
+        classes = re.findall("\.[a-zA-Z]+", selector)
+        return (ids, classes)
 
     def append(self, other):
         """Appends a KQuery object to this widget"""
